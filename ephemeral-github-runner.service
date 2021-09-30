@@ -1,0 +1,26 @@
+# Install with:
+#   sudo install -m 644 ephemeral-github-runner.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable ephemeral-github-runner
+# Run with:
+#   sudo systemctl start ephemeral-github-runner
+# Stop with:
+#   sudo systemctl stop ephemeral-github-runner
+# See live logs with:
+#   journalctl -f -u ephemeral-github-runner.service --no-tail
+
+[Unit]
+Description=Ephemeral GitHub Actions Runner Container
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/local/bin/docker-compose -f /home/ec2-user/ephemeral-github-runner/docker-compose.yml down
+ExecStartPre=-rm -rf /tmp/runner/work
+ExecStartPre=-/usr/bin/docker pull myoung34/github-runner:latest
+ExecStart=/usr/local/bin/docker-compose -f /home/ec2-user/ephemeral-github-runner/docker-compose.yml up --force-recreate --build
+
+[Install]
+WantedBy=multi-user.target
