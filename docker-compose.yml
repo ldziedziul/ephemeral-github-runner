@@ -1,0 +1,6 @@
+services:
+  worker:
+    build: docker
+    env_file: ephemeral-github-runner.env
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
